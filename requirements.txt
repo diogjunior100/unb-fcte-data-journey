@@ -3,3 +3,5 @@ numpy
 ipykernel
 openpyxl
 seaborn
+psycopg2
+python-dotenv
