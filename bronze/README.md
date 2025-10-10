@@ -75,6 +75,7 @@ Os dados da camada Bronze são processados na **camada Silver** através do note
 4. Cria colunas derivadas (Semestre, Departamento)
 5. Consolida dados de todos os semestres
 6. Exporta para CSV processado
+7. Cria coluna Curso
 
 ---
 
