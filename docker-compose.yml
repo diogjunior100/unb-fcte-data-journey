@@ -1,31 +1,44 @@
 services:
-  postgres:
+  db:
+    image: postgres:15
+    container_name: postgres_db
+    restart: always
     build:
       context: .
       dockerfile: Dockerfile
-    image: postgres:15
-    container_name: db
     environment:
       POSTGRES_DB: postgres
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres123
     ports:
-      - "5432:5432"   
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    restart: always
+      - "5432:5432"
 
   pgadmin:
-    image: dpage/pgadmin4:latest
+    image: dpage/pgadmin4
     container_name: pgadmin
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@example.com
       PGADMIN_DEFAULT_PASSWORD: admin
     ports:
       - "8080:80"      
+    depends_on: 
+      - db
+    restart: always
+
+  python-app:
+    build:
+      context: .
+      dockerfile: scripts/Dockerfile
+    container_name: python_populator
     depends_on:
-      - postgres
+      - db
+    environment:
+      DATABASE_HOST: postgres_db
+      DATABASE_PORT: 5432
+      DATABASE_USER: postgres
+      DATABASE_PASSWORD: postgres123
+      DATABASE_NAME: postgres
     restart: always
 
 volumes:
-  pgdata:
+  postgres_data:
