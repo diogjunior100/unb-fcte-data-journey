@@ -49,7 +49,7 @@ Cardinalidade: (n : m)
 
 ## Diagrama Entidade-Relacionamento
 
-![Diagrama Entidade-Relacionamento](der.jpg)
+![Diagrama Entidade-Relacionamento](./assets/der.jpg)
 
 ### Diagrama Mermaid (Alternativo)
 

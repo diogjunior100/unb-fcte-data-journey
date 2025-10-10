@@ -38,7 +38,6 @@ services:
       DATABASE_USER: postgres
       DATABASE_PASSWORD: postgres123
       DATABASE_NAME: postgres
-    restart: always
 
 volumes:
   postgres_data:
