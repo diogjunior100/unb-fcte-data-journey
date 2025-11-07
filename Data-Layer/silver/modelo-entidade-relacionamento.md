@@ -97,6 +97,8 @@ Esta combinação garante a unicidade de cada registro, pois uma disciplina não
 
 Como o modelo contém apenas uma entidade, não há relacionamentos entre entidades. O diagrama representa apenas a estrutura da tabela única.
 
+![Diagrama Entidade-Relacionamento](./assets/der.jpg)
+
 ### Diagrama Mermaid
 
 ```mermaid
@@ -119,10 +121,6 @@ erDiagram
         string curso PK "Curso (Software/Automotiva)"
     }
 ```
-
-## Diagrama Entidade Relacionamento
-
-![Diagrama Entidade-Relacionamento](./assets/der.jpg)
 
 ## Regras de Negócio
 
