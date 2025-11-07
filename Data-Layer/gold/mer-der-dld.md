@@ -121,9 +121,11 @@ O modelo segue o padrão **Star Schema** (Schema Estrela), onde uma tabela centr
 - **DIM_CURSO**: `id_curso` (INT, autoincrementado)
 - **FATO_DISCIPLINAS**: `id` (INT, autoincrementado)
 
-## Diagrama Entidade-Relacionamento
+## Diagrama Entidade-Relacionamento (DER)
 
 O modelo segue o padrão Star Schema, onde a tabela de fatos está no centro, conectada às tabelas dimensionais.
+
+O **Diagrama Entidade-Relacionamento (DER)** representa o modelo conceitual do banco de dados, mostrando as entidades, seus atributos e os relacionamentos entre elas de forma abstrata, sem detalhes de implementação física.
 
 ![Diagrama Entidade-Relacionamento](./assets/der.jpg)
 
@@ -176,6 +178,18 @@ erDiagram
     DIM_DEPARTAMENTO ||--o{ FATO_DISCIPLINAS : "pertence a"
     DIM_CURSO ||--o{ FATO_DISCIPLINAS : "oferecido para"
 ```
+
+## Diagrama Lógico de Dados (DLD)
+
+O **Diagrama Lógico de Dados (DLD)** representa a estrutura física do banco de dados, mostrando detalhes de implementação como tipos de dados, tamanhos de campos, chaves primárias, chaves estrangeiras, constraints, índices e outros elementos técnicos específicos do SGBD (Sistema Gerenciador de Banco de Dados).
+
+**Diferenças entre DER e DLD**:
+- **DER**: Foco no modelo conceitual, relacionamentos e cardinalidades
+- **DLD**: Foco na implementação física, tipos de dados, constraints e detalhes técnicos
+
+O DLD abaixo representa a implementação do modelo no PostgreSQL, conforme definido no arquivo `DDL.sql`.
+
+![Diagrama Lógico de Dados](./assets/dld.jpg)
 
 ## Exemplos de Consultas
 
