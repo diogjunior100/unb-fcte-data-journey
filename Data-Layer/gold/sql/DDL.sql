@@ -30,46 +30,46 @@ SET search_path TO dw;
 
 -- DIMENSÃO
 
-CREATE TABLE IF NOT EXISTS dw.dim_disciplinas (
-    id_disciplina INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    codigo VARCHAR(100) NOT NULL,
-    nome VARCHAR(100) NOT NULL
+CREATE TABLE IF NOT EXISTS dw.dim_disc (
+    srk_disc INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    cod_disc VARCHAR(100) NOT NULL,
+    nm_disc VARCHAR(100) NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS dw.dim_tempo (
-    id_tempo INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS dw.dim_tmp (
+    srk_tmp INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     ano INT NOT NULL,
-    semestre VARCHAR(100) NOT NULL
+    sem_ano VARCHAR(100) NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS dw.dim_departamento (
-    id_departamento INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    nome_departamento VARCHAR(100) NOT NULL
+CREATE TABLE IF NOT EXISTS dw.dim_dpt (
+    srk_dpt INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    nm_dpt VARCHAR(100) NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS dw.dim_curso (
-    id_curso INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    nome_curso VARCHAR(100) NOT NULL
+CREATE TABLE IF NOT EXISTS dw.dim_cur (
+    srk_cur INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    nome_cur VARCHAR(100) NOT NULL
 );
 
 -- FATO
 
-CREATE TABLE IF NOT EXISTS dw.fato_disciplinas (
-    id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    id_disciplina INT NOT NULL REFERENCES dw.dim_disciplinas(id_disciplina) ON DELETE CASCADE,
-    id_tempo INT NOT NULL REFERENCES dw.dim_tempo(id_tempo) ON DELETE CASCADE,
-    id_departamento INT NOT NULL REFERENCES dw.dim_departamento(id_departamento) ON DELETE CASCADE,
-    id_curso INT NOT NULL REFERENCES dw.dim_curso(id_curso) ON DELETE CASCADE,
-    turmas INT DEFAULT 0,
-    discentes INT DEFAULT 0,
-    cancelamentos INT DEFAULT 0,
-    reprovacoesmedia INT DEFAULT 0,
-    reprovacoesnota INT DEFAULT 0,
-    reprovacoesfalta INT DEFAULT 0,
-    reprovacoesmediafalta INT DEFAULT 0,
-    reprovacoesnotafalta INT DEFAULT 0,
-    trancamentos INT DEFAULT 0,
-    insucessos INT DEFAULT 0
+CREATE TABLE IF NOT EXISTS dw.fato_insuc (
+    srk INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    srk_disc INT NOT NULL REFERENCES dw.dim_disc(srk_disc) ON DELETE CASCADE,
+    srk_tmp INT NOT NULL REFERENCES dw.dim_tmp(srk_tmp) ON DELETE CASCADE,
+    srk_dpt INT NOT NULL REFERENCES dw.dim_dpt(srk_dpt) ON DELETE CASCADE,
+    srk_cur INT NOT NULL REFERENCES dw.dim_cur(srk_cur) ON DELETE CASCADE,
+    turm INT DEFAULT 0,
+    discen INT DEFAULT 0,
+    canc INT DEFAULT 0,
+    rpv_med INT DEFAULT 0,
+    rpv_not INT DEFAULT 0,
+    rpv_fal INT DEFAULT 0,
+    rpv_med_fal INT DEFAULT 0,
+    rpv_not_fal INT DEFAULT 0,
+    tranc INT DEFAULT 0,
+    insuc INT DEFAULT 0
 );
 
 

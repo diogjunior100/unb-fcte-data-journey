@@ -17,6 +17,57 @@ Este documento apresenta o modelo entidade-relacionamento (ME-R) para a camada G
 
 O modelo segue o padrão **Star Schema** (Schema Estrela), onde uma tabela central de fatos (`fato_disciplinas`) é conectada a múltiplas tabelas dimensionais através de chaves estrangeiras. Este modelo é otimizado para consultas analíticas e relatórios.
 
+### Mnemonicos:
+
+```
+    -- DIMENSÃO
+
+    dw.dim_disc - Dimensão disciplina
+    (
+        srk_disc - srk disciplina,
+        cod_disc - código da disciplina,
+        nm_disc - nome da disciplina
+    );
+
+    dw.dim_tmp - dimensão tempo
+    (
+        srk_tmp - srk tempo,
+        ano - ano,
+        sem-ano - semestre do ano
+    );
+
+    dw.dim_dpt dimensão departamento (
+        srk_dpt srk departamento,
+        nm_dpt - nome departamento
+    );
+
+    dw.dim_cur dimensão curso 
+    (
+        srk_cur - srk curso,
+        nm_cur nome curso
+    );
+
+    -- FATO
+
+    dw.fato_insuc fato insucesso
+    (
+        srk ,
+        srk_disc ,
+        srk_tmp ,
+        srk_dpt ,
+        srk_cur ,
+        turm - turmas,
+        discen - discentes,
+        canc - cancelamentos,
+        rpv_med - reprovacoes media,
+        rpv_not reprovacoes nota,
+        rpv_fal reprovacoes falta,
+        rpv_med_fal - reprovacoes media falta,
+        rpv_not_fal - reprovacoes nota falta,
+        tranc - trancamentos,
+        insuc - insucessos
+    );
+```
 ## Entidades
 
 ### Tabelas Dimensionais
@@ -256,6 +307,6 @@ A tabela `public.disciplinas` serve como fonte de dados para o Data Warehouse. E
 
 ---
 
-*Última atualização: 2024*  
+*Última atualização: 2025*  
 *Versão: 1.0 - Modelo Dimensional (Star Schema)*
 
