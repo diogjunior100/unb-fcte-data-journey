@@ -33,7 +33,7 @@ O modelo segue o padrão **Star Schema** (Schema Estrela), onde uma tabela centr
     (
         srk_tmp - srk tempo,
         ano - ano,
-        sem-ano - semestre do ano
+        sem_ano - semestre do ano
     );
 
     dw.dim_dpt dimensão departamento (
@@ -185,49 +185,49 @@ O **Diagrama Entidade-Relacionamento (DER)** representa o modelo conceitual do b
 ```mermaid
 erDiagram
     DIM_DISC {
-        int id_disciplina PK "Identificador único"
-        string codigo "Código da disciplina"
-        string nome "Nome da disciplina"
+        int srk_disc PK "Identificador único"
+        string cod_disc "Código da disciplina"
+        string nm_disc "Nome da disciplina"
     }
     
     DIM_TMP {
-        int id_tempo PK "Identificador único"
+        int srk_tmp PK "Identificador único"
         int ano "Ano do semestre"
-        string semestre "Semestre letivo (AAAA-S)"
+        string sem_ano "Semestre letivo (AAAA-S)"
     }
     
     DIM_DPT {
-        int id_departamento PK "Identificador único"
-        string nome_departamento "Nome do departamento"
+        int srk_dpt PK "Identificador único"
+        string nm_dpt "Nome do departamento"
     }
     
     DIM_CUR {
-        int id_curso PK "Identificador único"
-        string nome_curso "Nome do curso"
+        int srk_cur PK "Identificador único"
+        string nm_cur "Nome do curso"
     }
     
     FATO_INSUC {
-        int id PK "Identificador único"
-        int id_disciplina FK "Referência à disciplina"
-        int id_tempo FK "Referência ao tempo"
-        int id_departamento FK "Referência ao departamento"
-        int id_curso FK "Referência ao curso"
-        int turmas "Número de turmas"
-        int discentes "Total de estudantes"
-        int cancelamentos "Cancelamentos"
-        int reprovacoesmedia "Reprovações por média"
-        int reprovacoesnota "Reprovações por nota"
-        int reprovacoesfalta "Reprovações por falta"
-        int reprovacoesmediafalta "Reprovações por média e falta"
-        int reprovacoesnotafalta "Reprovações por nota e falta"
-        int trancamentos "Trancamentos"
-        int insucessos "Total de insucessos"
+        int srk PK "Identificador único"
+        int srk_disc FK "Referência à disciplina"
+        int srk_tmp FK "Referência ao tempo"
+        int srk_dpt FK "Referência ao departamento"
+        int srk_cur FK "Referência ao curso"
+        int turm "Número de turmas"
+        int discen "Total de estudantes"
+        int canc "Cancelamentos"
+        int rpv_med "Reprovações por média"
+        int rpv_not "Reprovações por nota"
+        int rpv_fal "Reprovações por falta"
+        int rpv_med_fal "Reprovações por média e falta"
+        int rpv_not_fal "Reprovações por nota e falta"
+        int tranc "Trancamentos"
+        int insuc "Total de insucessos"
     }
     
-    DIM_DISCIPLINAS ||--o{ FATO_DISCIPLINAS : "tem"
-    DIM_TEMPO ||--o{ FATO_DISCIPLINAS : "ocorre em"
-    DIM_DEPARTAMENTO ||--o{ FATO_DISCIPLINAS : "pertence a"
-    DIM_CURSO ||--o{ FATO_DISCIPLINAS : "oferecido para"
+    DIM_DISC ||--o{ FATO_INSUC : "tem"
+    DIM_TMP ||--o{ FATO_INSUC : "ocorre em"
+    DIM_DPT ||--o{ FATO_INSUC : "pertence a"
+    DIM_CUR ||--o{ FATO_INSUC : "oferecido para"
 ```
 
 ## Diagrama Lógico de Dados (DLD)
