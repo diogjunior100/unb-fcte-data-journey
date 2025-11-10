@@ -72,71 +72,71 @@ O modelo segue o padrão **Star Schema** (Schema Estrela), onde uma tabela centr
 
 ### Tabelas Dimensionais
 
-#### 1. DIM_DISCIPLINAS
+#### 1. DIM_DISC
 
 **Descrição**: Representa as disciplinas oferecidas pela universidade, contendo informações descritivas sobre cada disciplina.
 
 **Atributos**:
-- **`id_disciplina`** (INT, PK): Identificador único autoincrementado (GENERATED ALWAYS AS IDENTITY)
-- **`codigo`** (VARCHAR(100), NOT NULL): Código único da disciplina (ex: MAT0025, CIC0004, FGA0038)
-- **`nome`** (VARCHAR(100), NOT NULL): Nome oficial da disciplina
+- **`srk_disc`** (INT, PK): Identificador único autoincrementado (GENERATED ALWAYS AS IDENTITY)
+- **`cod_disc`** (VARCHAR(100), NOT NULL): Código único da disciplina (ex: MAT0025, CIC0004, FGA0038)
+- **`nm_disc`** (VARCHAR(100), NOT NULL): Nome oficial da disciplina
 
 **Observação**: Cada disciplina é representada uma única vez nesta tabela, eliminando redundância.
 
-#### 2. DIM_TEMPO
+#### 2. DIM_TMP
 
 **Descrição**: Representa a dimensão temporal, contendo informações sobre os semestres letivos.
 
 **Atributos**:
-- **`id_tempo`** (INT, PK): Identificador único autoincrementado (GENERATED ALWAYS AS IDENTITY)
+- **`srk_tmp`** (INT, PK): Identificador único autoincrementado (GENERATED ALWAYS AS IDENTITY)
 - **`ano`** (INT, NOT NULL): Ano do semestre letivo (ex: 2023, 2024, 2025)
-- **`semestre`** (VARCHAR(100), NOT NULL): Semestre letivo no formato AAAA-S (ex: 2023-2, 2024-1)
+- **`sem-ano`** (VARCHAR(100), NOT NULL): Semestre letivo no formato AAAA-S (ex: 2023-2, 2024-1)
 
 **Observação**: Permite análises temporais e agregações por período.
 
-#### 3. DIM_DEPARTAMENTO
+#### 3. DIM_DPT
 
 **Descrição**: Representa os departamentos acadêmicos responsáveis pelas disciplinas.
 
 **Atributos**:
-- **`id_departamento`** (INT, PK): Identificador único autoincrementado (GENERATED ALWAYS AS IDENTITY)
-- **`nome_departamento`** (VARCHAR(100), NOT NULL): Nome completo do departamento (ex: MAT, CIC, FGA, IFD)
+- **`srk_dpt`** (INT, PK): Identificador único autoincrementado (GENERATED ALWAYS AS IDENTITY)
+- **`nm_dpt`** (VARCHAR(100), NOT NULL): Nome completo do departamento (ex: MAT, CIC, FGA, IFD)
 
 **Observação**: Centraliza informações sobre departamentos, facilitando manutenção e análises por unidade acadêmica.
 
-#### 4. DIM_CURSO
+#### 4. DIM_CUR
 
 **Descrição**: Representa os cursos aos quais as turmas pertencem.
 
 **Atributos**:
-- **`id_curso`** (INT, PK): Identificador único autoincrementado (GENERATED ALWAYS AS IDENTITY)
-- **`nome_curso`** (VARCHAR(100), NOT NULL): Nome do curso (ex: Software, Automotiva)
+- **`srk_cur`** (INT, PK): Identificador único autoincrementado (GENERATED ALWAYS AS IDENTITY)
+- **`nm_cur`** (VARCHAR(100), NOT NULL): Nome do curso (ex: Software, Automotiva)
 
 **Observação**: Permite análises comparativas entre diferentes cursos.
 
 ### Tabela de Fatos
 
-#### FATO_DISCIPLINAS
+#### FATO_INSUC
 
 **Descrição**: Tabela central que armazena as métricas de insucesso acadêmico para cada combinação de disciplina, tempo, departamento e curso.
 
 **Atributos de Relacionamento (Chaves Estrangeiras)**:
-- **`id_disciplina`** (INT, NOT NULL, FK): Referência a `dim_disciplinas(id_disciplina)`
-- **`id_tempo`** (INT, NOT NULL, FK): Referência a `dim_tempo(id_tempo)`
-- **`id_departamento`** (INT, NOT NULL, FK): Referência a `dim_departamento(id_departamento)`
-- **`id_curso`** (INT, NOT NULL, FK): Referência a `dim_curso(id_curso)`
+- **`srk_disc`** (INT, NOT NULL, FK): Referência a `dim_disc(srk_disc)`
+- **`srk_tmp`** (INT, NOT NULL, FK): Referência a `dim_tmp(srk_tmp)`
+- **`srk_dpt`** (INT, NOT NULL, FK): Referência a `dim_dpt(srk_dpt)`
+- **`srk_cur`** (INT, NOT NULL, FK): Referência a `dim_cur(srk_cur)`
 
 **Atributos de Métricas**:
-- **`turmas`** (INT, DEFAULT 0): Número de turmas ofertadas da disciplina no semestre/curso
-- **`discentes`** (INT, DEFAULT 0): Número total de estudantes matriculados na disciplina
-- **`cancelamentos`** (INT, DEFAULT 0): Número de cancelamentos de matrícula
-- **`reprovacoesmedia`** (INT, DEFAULT 0): Número de reprovações por média insuficiente
-- **`reprovacoesnota`** (INT, DEFAULT 0): Número de reprovações por nota específica
-- **`reprovacoesfalta`** (INT, DEFAULT 0): Número de reprovações por excesso de faltas
-- **`reprovacoesmediafalta`** (INT, DEFAULT 0): Número de reprovações por média insuficiente e excesso de faltas
-- **`reprovacoesnotafalta`** (INT, DEFAULT 0): Número de reprovações por nota específica e excesso de faltas
-- **`trancamentos`** (INT, DEFAULT 0): Número de trancamentos de matrícula
-- **`insucessos`** (INT, DEFAULT 0): Soma total de insucessos (calculado)
+- **`turm`** (INT, DEFAULT 0): Número de turmas ofertadas da disciplina no semestre/curso
+- **`disc`** (INT, DEFAULT 0): Número total de estudantes matriculados na disciplina
+- **`canc`** (INT, DEFAULT 0): Número de cancelamentos de matrícula
+- **`rpv_med`** (INT, DEFAULT 0): Número de reprovações por média insuficiente
+- **`rpv_not`** (INT, DEFAULT 0): Número de reprovações por nota específica
+- **`rpv_fal`** (INT, DEFAULT 0): Número de reprovações por excesso de faltas
+- **`rpv_med_fal`** (INT, DEFAULT 0): Número de reprovações por média insuficiente e excesso de faltas
+- **`rpv_not_fal`** (INT, DEFAULT 0): Número de reprovações por nota específica e excesso de faltas
+- **`tranc`** (INT, DEFAULT 0): Número de trancamentos de matrícula
+- **`insuc`** (INT, DEFAULT 0): Soma total de insucessos (calculado)
 
 **Chave Primária**: `id` (INT, GENERATED ALWAYS AS IDENTITY)
 
@@ -144,22 +144,22 @@ O modelo segue o padrão **Star Schema** (Schema Estrela), onde uma tabela centr
 
 ## Relacionamentos
 
-### DIM_DISCIPLINAS → FATO_DISCIPLINAS
+### DIM_DISC → FATO_INSUC
 - **Cardinalidade**: 1:N (Um para Muitos)
 - **Descrição**: Uma disciplina pode ter múltiplos registros de fatos (em diferentes semestres, cursos, etc.)
 - **Integridade Referencial**: `ON DELETE CASCADE` - Se uma disciplina for removida, todos os fatos relacionados são removidos
 
-### DIM_TEMPO → FATO_DISCIPLINAS
+### DIM_TMP → FATO_INSUC
 - **Cardinalidade**: 1:N (Um para Muitos)
 - **Descrição**: Um período de tempo pode ter múltiplos registros de fatos (diferentes disciplinas, cursos, etc.)
 - **Integridade Referencial**: `ON DELETE CASCADE` - Se um período for removido, todos os fatos relacionados são removidos
 
-### DIM_DEPARTAMENTO → FATO_DISCIPLINAS
+### DIM_DPT → FATO_INSUC
 - **Cardinalidade**: 1:N (Um para Muitos)
 - **Descrição**: Um departamento pode ter múltiplos registros de fatos (diferentes disciplinas, semestres, cursos, etc.)
 - **Integridade Referencial**: `ON DELETE CASCADE` - Se um departamento for removido, todos os fatos relacionados são removidos
 
-### DIM_CURSO → FATO_DISCIPLINAS
+### DIM_CUR → FATO_INSUC
 - **Cardinalidade**: 1:N (Um para Muitos)
 - **Descrição**: Um curso pode ter múltiplos registros de fatos (diferentes disciplinas, semestres, departamentos, etc.)
 - **Integridade Referencial**: `ON DELETE CASCADE` - Se um curso for removido, todos os fatos relacionados são removidos
@@ -247,41 +247,44 @@ O DLD abaixo representa a implementação do modelo no PostgreSQL, conforme defi
 ### Exemplo 1: Total de Insucessos por Departamento
 ```sql
 SELECT 
-    d.nome_departamento,
-    SUM(f.insucessos) AS total_insucessos
-FROM dw.fato_disciplinas f
-JOIN dw.dim_departamento d ON f.id_departamento = d.id_departamento
-GROUP BY d.nome_departamento
+    d.nm_dpt,
+    SUM(f.insuc) AS total_insucessos
+FROM dw.fato_insuc f
+JOIN dw.dim_dpt d ON f.srk_dpt = d.srk_dpt
+GROUP BY d.nm_dpt
 ORDER BY total_insucessos DESC;
 ```
+![Consulta-1](./assets/Query-1.png)
 
 ### Exemplo 2: Evolução Temporal de Disciplina
 ```sql
 SELECT 
     t.ano,
-    t.semestre,
-    disc.nome,
-    f.discentes,
-    f.insucessos
-FROM dw.fato_disciplinas f
-JOIN dw.dim_tempo t ON f.id_tempo = t.id_tempo
-JOIN dw.dim_disciplinas disc ON f.id_disciplina = disc.id_disciplina
-WHERE disc.codigo = 'MAT0025'
-ORDER BY t.ano, t.semestre;
+    t.sem_ano,
+    disc.nm_disc,
+    f.discen,
+    f.insuc
+FROM dw.fato_insuc f
+JOIN dw.dim_tmp t ON f.srk_tmp = t.srk_tmp
+JOIN dw.dim_disc disc ON f.srk_disc = disc.srk_disc
+WHERE disc.cod_disc = 'MAT0025'
+ORDER BY t.ano, t.sem_ano;
 ```
+![Consulta-2](./assets/Query-2.png)
 
 ### Exemplo 3: Comparação entre Cursos
 ```sql
 SELECT 
-    c.nome_curso,
-    COUNT(DISTINCT f.id_disciplina) AS total_disciplinas,
-    SUM(f.discentes) AS total_discentes,
-    SUM(f.insucessos) AS total_insucessos,
-    ROUND(SUM(f.insucessos)::NUMERIC / SUM(f.discentes) * 100, 2) AS taxa_insucesso
-FROM dw.fato_disciplinas f
-JOIN dw.dim_curso c ON f.id_curso = c.id_curso
-GROUP BY c.nome_curso;
+    c.nome_cur,
+    COUNT(DISTINCT f.srk_disc) AS total_disciplinas,
+    SUM(f.discen) AS total_discentes,
+    SUM(f.insuc) AS total_insucessos,
+    ROUND(SUM(f.insuc)::NUMERIC / SUM(f.discen) * 100, 2) AS taxa_insucesso
+FROM dw.fato_insuc f
+JOIN dw.dim_cur c ON f.srk_cur = c.srk_cur
+GROUP BY c.nome_cur;
 ```
+![Consulta-3](./assets/Query-3.png)
 
 ## Tabela Original
 
