@@ -184,29 +184,29 @@ O **Diagrama Entidade-Relacionamento (DER)** representa o modelo conceitual do b
 
 ```mermaid
 erDiagram
-    DIM_DISCIPLINAS {
+    DIM_DISC {
         int id_disciplina PK "Identificador único"
         string codigo "Código da disciplina"
         string nome "Nome da disciplina"
     }
     
-    DIM_TEMPO {
+    DIM_TMP {
         int id_tempo PK "Identificador único"
         int ano "Ano do semestre"
         string semestre "Semestre letivo (AAAA-S)"
     }
     
-    DIM_DEPARTAMENTO {
+    DIM_DPT {
         int id_departamento PK "Identificador único"
         string nome_departamento "Nome do departamento"
     }
     
-    DIM_CURSO {
+    DIM_CUR {
         int id_curso PK "Identificador único"
         string nome_curso "Nome do curso"
     }
     
-    FATO_DISCIPLINAS {
+    FATO_INSUC {
         int id PK "Identificador único"
         int id_disciplina FK "Referência à disciplina"
         int id_tempo FK "Referência ao tempo"
