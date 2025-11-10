@@ -262,13 +262,15 @@ SELECT
     t.ano,
     t.sem_ano,
     disc.nm_disc,
+	cur.nome_cur,
     f.discen,
     f.insuc
 FROM dw.fato_insuc f
 JOIN dw.dim_tmp t ON f.srk_tmp = t.srk_tmp
 JOIN dw.dim_disc disc ON f.srk_disc = disc.srk_disc
+JOIN dw.dim_cur cur ON f.srk_cur = cur.srk_cur
 WHERE disc.cod_disc = 'MAT0025'
-ORDER BY t.ano, t.sem_ano;
+ORDER BY t.ano, t.sem_ano, cur.nome_cur;
 ```
 ![Consulta-2](./assets/Query-2.png)
 
