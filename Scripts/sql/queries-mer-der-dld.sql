@@ -1,16 +1,3 @@
--- Consultas analíticas para Data Visualization (baseadas apenas na camada Gold - schema dw)
--- Confirmado no DDL:
---   dw.dim_disc(srk_disc, cod_disc, nm_disc)
---   dw.dim_tmp (srk_tmp, ano, sem_ano)
---   dw.dim_dpt (srk_dpt, nm_dpt)
---   dw.dim_cur (srk_cur, nome_cur)
---   dw.fato_insuc (..., turm, discen, canc, rpv_med, rpv_not, rpv_fal, rpv_med_fal, rpv_not_fal, tranc, insuc)
--- Observação: use cada SELECT como fonte de visual no Power BI. Ajuste LIMITs/HAVING conforme necessidade.
-
-
--- 00) (Opcional) Fixar search_path para facilitar execução manual
--- SET search_path TO dw, public;
-
 
 -- 01) KPIs gerais (visão macro do período completo)
 SELECT
@@ -61,7 +48,6 @@ ORDER BY t.ano, t.sem_ano;
 
 
 -- 05) Top disciplinas por taxa de insucesso (com mínimo de alunos para robustez)
--- Ajuste o mínimo conforme necessidade (ex.: 100, 200...)
 SELECT
     dd.cod_disc,
     dd.nm_disc,
