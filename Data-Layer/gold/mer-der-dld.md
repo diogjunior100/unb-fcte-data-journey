@@ -15,7 +15,7 @@ Este documento apresenta o modelo entidade-relacionamento (ME-R) para a camada G
 
 ## Modelo de Dados
 
-O modelo segue o padrão **Star Schema** (Schema Estrela), onde uma tabela central de fatos (`fato_disciplinas`) é conectada a múltiplas tabelas dimensionais através de chaves estrangeiras. Este modelo é otimizado para consultas analíticas e relatórios.
+O modelo segue o padrão **Star Schema** (Schema Estrela), onde uma tabela central de fatos (`fat_ins_dsc`) é conectada a múltiplas tabelas dimensionais através de chaves estrangeiras. Este modelo é otimizado para consultas analíticas e relatórios.
 
 
 ## Entidades
@@ -88,7 +88,7 @@ O modelo segue o padrão **Star Schema** (Schema Estrela), onde uma tabela centr
 - **`trc`** (INT, DEFAULT 0): Número de trancamentos de matrícula
 - **`ins`** (INT, DEFAULT 0): Soma total de insucessos (calculado)
 
-**Chave Primária**: `srk` (INT, GENERATED ALWAYS AS IDENTITY)
+**Chave Primária**: `srk_fat_ins_dsc` (INT, GENERATED ALWAYS AS IDENTITY)
 
 **Observação**: Cada registro representa uma combinação única de disciplina, tempo, departamento e curso, com suas respectivas métricas de insucesso.
 
@@ -120,7 +120,7 @@ O modelo segue o padrão **Star Schema** (Schema Estrela), onde uma tabela centr
 - **DIM_TMP**: `srk_tmp` (INT, autoincrementado)
 - **DIM_DPT**: `srk_dpt` (INT, autoincrementado)
 - **DIM_CUR**: `srk_cur` (INT, autoincrementado)
-- **FAT_INS_DSC**: `srk` (INT, autoincrementado)
+- **FAT_INS_DSC**: `srk_fat_ins_dsc` (INT, autoincrementado)
 
 ## Diagrama Entidade-Relacionamento (DER)
 
@@ -128,7 +128,7 @@ O modelo segue o padrão Star Schema, onde a tabela de fatos está no centro, co
 
 O **Diagrama Entidade-Relacionamento (DER)** representa o modelo conceitual do banco de dados, mostrando as entidades, seus atributos e os relacionamentos entre elas de forma abstrata, sem detalhes de implementação física.
 
-![Diagrama Entidade-Relacionamento](./assets/der.jpg)
+![Diagrama Entidade-Relacionamento](./assets/der.png)
 
 ### Diagrama Mermaid
 
@@ -190,7 +190,7 @@ O **Diagrama Lógico de Dados (DLD)** representa a estrutura física do banco de
 
 O DLD abaixo representa a implementação do modelo no PostgreSQL, conforme definido no arquivo `DDL.sql`.
 
-![Diagrama Lógico de Dados](./assets/dld.jpg)
+![Diagrama Lógico de Dados](./assets/dld.png)
 
 ## Exemplos de Consultas
 
