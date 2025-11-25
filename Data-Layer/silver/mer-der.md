@@ -97,7 +97,13 @@ Esta combinação garante a unicidade de cada registro, pois uma disciplina não
 
 Como o modelo contém apenas uma entidade, não há relacionamentos entre entidades. O diagrama representa apenas a estrutura da tabela única.
 
-![Diagrama Entidade-Relacionamento](./assets/der.jpg)
+![Diagrama Entidade-Relacionamento](./assets/der_silver.png)
+
+## Diagrama Lógico
+
+Como o modelo contém apenas uma entidade, não há relacionamentos entre entidades. O diagrama representa apenas a estrutura da tabela única.
+
+![Diagrama Entidade-Relacionamento](./assets/dld_silver.png)
 
 ### Diagrama Mermaid
 
