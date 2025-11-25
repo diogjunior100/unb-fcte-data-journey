@@ -194,7 +194,7 @@ O DLD abaixo representa a implementação do modelo no PostgreSQL, conforme defi
 
 ## Exemplos de Consultas
 
-### Exemplo 1: Total de Insucessos por Departamento
+### Exemplo 1: Visão geral de insucessos, cancelamentos e trancamentos por departamento
 ```sql
 SELECT
     SUM(f.dst)::bigint                                   AS total_discentes,
@@ -207,7 +207,7 @@ FROM dw.fat_ins_dsc f;
 ```
 ![Consulta-1](./assets/Query-1.png)
 
-### Exemplo 2: Evolução Temporal de Disciplina
+### Exemplo 2: Taxa de insucesso por departamento
 ```sql
 SELECT
     d.nme_dpt,
@@ -221,7 +221,7 @@ ORDER BY taxa_insucesso_pct DESC, total_insucessos DESC;
 ```
 ![Consulta-2](./assets/Query-2.png)
 
-### Exemplo 3: Comparação entre Cursos
+### Exemplo 3: Taxa de insucesso por curso
 ```sql
 SELECT
     c.nme_cur,
@@ -236,7 +236,7 @@ ORDER BY taxa_insucesso_pct DESC, total_insucessos DESC;
 ![Consulta-3](./assets/Query-3.png)
 
 
-### Exemplo 4: 
+### Exemplo 4: Evolução temporal de insucesso por semestre
 ```sql
 SELECT
     t.ano,
@@ -251,7 +251,7 @@ ORDER BY t.ano, t."sem_ano";
 ```
 ![Consulta-4](./assets/Query-4.png)
 
-### Exemplo 5: 
+### Exemplo 5: Disciplinas com mais de 100 discentes ordenadas por taxa de insucesso
 ```sql
 SELECT
     dd.cod_dsc,
@@ -268,7 +268,7 @@ LIMIT 20;
 ```
 ![Consulta-5](./assets/Query-5.png)
 
-### Exemplo 6: 
+### Exemplo 6: Disciplinas com mais de 100 discentes ordenadas por total de insucessos
 ```sql
 SELECT
     dd.cod_dsc,
@@ -286,6 +286,7 @@ LIMIT 20;
 ![Consulta-6](./assets/Query-6.png)
 
 ### Exemplo 7: 
+**Nome:** Disciplinas com mais de 100 discentes ordenadas por insucessos e taxa
 ```sql
 SELECT
     dd.cod_dsc,
@@ -302,7 +303,7 @@ LIMIT 20;
 ```
 ![Consulta-7](./assets/Query-7.png)
 
-### Exemplo 8: 
+### Exemplo 8: Detalhamento de tipos de reprovação por departamento
 ```sql
 SELECT
     d.nme_dpt,
@@ -324,7 +325,7 @@ ORDER BY total_reprovacoes DESC;
 ```
 ![Consulta-8](./assets/Query-8.png)
 
-### Exemplo 9: 
+### Exemplo 9: Taxa de insucesso por departamento e curso
 ```sql
 SELECT
     d.nme_dpt,
@@ -339,6 +340,181 @@ GROUP BY d.nme_dpt, c.nme_cur
 ORDER BY d.nme_dpt, taxa_insucesso_pct DESC, c.nme_cur;
 ```
 ![Consulta-9](./assets/Query-9.png)
+
+### Exemplo 10: Variação da taxa de insucesso por departamento ao longo dos semestres
+```sql
+WITH serie AS (
+    SELECT
+        d.nme_dpt,
+        t.ano,
+        t."sem_ano",
+        SUM(f.dst) AS dst,
+        SUM(f.ins)  AS ins
+    FROM dw.fat_ins_dsc f
+    JOIN dw.dim_dpt d ON d.srk_dpt = f.srk_dpt
+    JOIN dw.dim_tmp t ON t.srk_tmp = f.srk_tmp
+    GROUP BY d.nme_dpt, t.ano, t."sem_ano"
+), taxa AS (
+    SELECT
+        nme_dpt,
+        ano,
+        "sem_ano",
+        ROUND(ins::numeric / NULLIF(dst, 0) * 100, 2) AS taxa_insucesso_pct
+    FROM serie
+)
+SELECT
+    nme_dpt,
+    ano,
+    "sem_ano",
+    taxa_insucesso_pct,
+    ROUND(taxa_insucesso_pct - LAG(taxa_insucesso_pct) OVER (PARTITION BY nme_dpt ORDER BY ano, "sem_ano"), 2) AS delta_pct
+FROM taxa
+ORDER BY nme_dpt, ano, "sem_ano";
+```
+![Consulta-10](./assets/Query-10.png)
+
+### Exemplo 11: Contribuição percentual de insucessos por departamento
+```sql
+SELECT
+    d.nme_dpt,
+    SUM(f.ins)                                            AS insucessos,
+    SUM(SUM(f.ins)) OVER ()                               AS insucessos_total,
+    ROUND(SUM(f.ins)::numeric / NULLIF(SUM(SUM(f.ins)) OVER (), 0) * 100, 2) AS pct_contribuicao
+FROM dw.fat_ins_dsc f
+JOIN dw.dim_dpt d ON d.srk_dpt = f.srk_dpt
+GROUP BY d.nme_dpt
+ORDER BY pct_contribuicao DESC;
+```
+![Consulta-11](./assets/Query-11.png)
+
+### Exemplo 12: Disciplinas com maior volatilidade na taxa de insucesso
+```sql
+WITH por_sem AS (
+    SELECT
+        dd.cod_dsc,
+        dd.nme_dsc,
+        t.ano,
+        t."sem_ano",
+        SUM(f.dst) AS dst,
+        SUM(f.ins)  AS ins
+    FROM dw.fat_ins_dsc f
+    JOIN dw.dim_dsc dd ON dd.srk_dsc = f.srk_dsc
+    JOIN dw.dim_tmp  t  ON t.srk_tmp  = f.srk_tmp
+    GROUP BY dd.cod_dsc, dd.nme_dsc, t.ano, t."sem_ano"
+), taxas AS (
+    SELECT
+        cod_dsc,
+        nme_dsc,
+        ano,
+        "sem_ano",
+        CASE WHEN dst > 0 THEN ins::numeric / dst * 100 ELSE NULL END AS taxa_pct
+    FROM por_sem
+), aggr AS (
+    SELECT
+        cod_dsc,
+        nme_dsc,
+        COUNT(taxa_pct)                                      AS semestres_com_dados,
+        ROUND(AVG(taxa_pct)::numeric, 2)                     AS taxa_media_pct,
+        ROUND(STDDEV_POP(taxa_pct)::numeric, 2)              AS volatilidade_pct
+    FROM taxas
+    GROUP BY cod_dsc, nme_dsc
+    HAVING COUNT(taxa_pct) >= 2 AND SUM(1) >= 2
+)
+SELECT *
+FROM aggr
+ORDER BY volatilidade_pct DESC, taxa_media_pct DESC
+LIMIT 30;
+```
+![Consulta-12](./assets/Query-12.png)
+
+### Exemplo 13: Ranking de taxa de insucesso por disciplina dentro de cada curso
+```sql
+SELECT
+    c.nme_cur,
+    dd.cod_dsc,
+    dd.nme_dsc,
+    SUM(f.dst)                                           AS total_discentes,
+    SUM(f.ins)                                            AS total_insucessos,
+    ROUND(SUM(f.ins)::numeric / NULLIF(SUM(f.dst), 0) * 100, 2) AS taxa_insucesso_pct,
+    RANK() OVER (PARTITION BY c.nme_cur ORDER BY SUM(f.ins)::numeric / NULLIF(SUM(f.dst), 0) DESC NULLS LAST) AS rank_taxa_no_curso
+FROM dw.fat_ins_dsc f
+JOIN dw.dim_cur c  ON c.srk_cur  = f.srk_cur
+JOIN dw.dim_dsc dd ON dd.srk_dsc = f.srk_dsc
+GROUP BY c.nme_cur, dd.cod_dsc, dd.nme_dsc
+HAVING SUM(f.dst) >= 80
+ORDER BY c.nme_cur, rank_taxa_no_curso;
+```
+![Consulta-13](./assets/Query-13.png)
+
+### Exemplo 14: Evolução da taxa de insucesso por disciplina e semestre
+```sql
+SELECT
+    dd.cod_dsc,
+    dd.nme_dsc,
+    t.ano,
+    t."sem_ano",
+    SUM(f.dst)                                           AS total_discentes,
+    SUM(f.ins)                                            AS total_insucessos,
+    ROUND(SUM(f.ins)::numeric / NULLIF(SUM(f.dst), 0) * 100, 2) AS taxa_insucesso_pct
+FROM dw.fat_ins_dsc f
+JOIN dw.dim_dsc dd ON dd.srk_dsc = f.srk_dsc
+JOIN dw.dim_tmp  t  ON t.srk_tmp  = f.srk_tmp
+GROUP BY dd.cod_dsc, dd.nme_dsc, t.ano, t."sem_ano"
+ORDER BY dd.cod_dsc, t.ano, t."sem_ano";
+```
+![Consulta-14](./assets/Query-14.png)
+
+
+### Exemplo 15: Evolução da taxa de insucesso por curso e semestre
+```sql
+SELECT
+    c.nme_cur,
+    t.ano,
+    t."sem_ano",
+    SUM(f.dst)                                           AS total_discentes,
+    SUM(f.ins)                                            AS total_insucessos,
+    ROUND(SUM(f.ins)::numeric / NULLIF(SUM(f.dst), 0) * 100, 2) AS taxa_insucesso_pct
+FROM dw.fat_ins_dsc f
+JOIN dw.dim_cur c ON c.srk_cur = f.srk_cur
+JOIN dw.dim_tmp t ON t.srk_tmp = f.srk_tmp
+GROUP BY c.nme_cur, t.ano, t."sem_ano"
+ORDER BY c.nme_cur, t.ano, t."sem_ano";
+```
+![Consulta-15](./assets/Query-15.png)
+
+### Exemplo 16: Taxa de cancelamento e trancamento por departamento
+```sql
+SELECT
+    d.nme_dpt,
+    SUM(f.dst)                                           AS total_discentes,
+    SUM(f.cnc)                                             AS total_cancelamentos,
+    SUM(f.trc)                                            AS total_trancamentos,
+    ROUND(SUM(f.cnc)::numeric  / NULLIF(SUM(f.dst), 0) * 100, 2) AS taxa_cancelamento_pct,
+    ROUND(SUM(f.trc)::numeric / NULLIF(SUM(f.dst), 0) * 100, 2) AS taxa_trancamento_pct
+FROM dw.fat_ins_dsc f
+JOIN dw.dim_dpt d ON d.srk_dpt = f.srk_dpt
+GROUP BY d.nme_dpt
+ORDER BY taxa_cancelamento_pct DESC;
+```
+![Consulta-16](./assets/Query-16.png)
+
+### Exemplo 17: Top 10 semestres com maior número de insucessos
+```sql
+SELECT
+    t.ano,
+    t."sem_ano",
+    SUM(f.ins) AS total_insucessos,
+    SUM(f.dst) AS total_discentes,
+    ROUND(SUM(f.ins)::numeric / NULLIF(SUM(f.dst), 0) * 100, 2) AS taxa_insucesso_pct
+FROM dw.fat_ins_dsc f
+JOIN dw.dim_tmp t ON t.srk_tmp = f.srk_tmp
+GROUP BY t.ano, t."sem_ano"
+ORDER BY total_insucessos DESC
+LIMIT 10;
+```
+![Consulta-17](./assets/Query-17.png)
+
+
 
 ## Tabela Original
 
