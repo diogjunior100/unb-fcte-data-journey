@@ -196,47 +196,149 @@ O DLD abaixo representa a implementação do modelo no PostgreSQL, conforme defi
 
 ### Exemplo 1: Total de Insucessos por Departamento
 ```sql
-SELECT 
-    d.nme_dpt,
-    SUM(f.ins) AS total_insucessos
-FROM dw.fato_ins f
-JOIN dw.dim_dpt d ON f.srk_dpt = d.srk_dpt
-GROUP BY d.nme_dpt
-ORDER BY total_insucessos DESC;
+SELECT
+    SUM(f.dst)::bigint                                   AS total_discentes,
+    SUM(f.ins)::bigint                                    AS total_insucessos,
+    ROUND(SUM(f.ins)::numeric / NULLIF(SUM(f.dst), 0) * 100, 2) AS taxa_insucesso_pct,
+    SUM(f.cnc)::bigint                                     AS total_cancelamentos,
+    SUM(f.trc)::bigint                                    AS total_trancamentos,
+    (SUM(f.rpv_med)+SUM(f.rpv_not)+SUM(f.rpv_fal)+SUM(f.rpv_med_fal)+SUM(f.rpv_not_fal))::bigint AS total_reprovacoes
+FROM dw.fat_ins_dsc f;
 ```
 ![Consulta-1](./assets/Query-1.png)
 
 ### Exemplo 2: Evolução Temporal de Disciplina
 ```sql
-SELECT 
-    t.ano,
-    t.sem_ano,
-    dsc.nme_dsc,
-	cur.nme_cur,
-    f.dst,
-    f.ins
-FROM dw.fat_ins f
-JOIN dw.dim_tmp t ON f.srk_tmp = t.srk_tmp
-JOIN dw.dim_dsc dsc ON f.srk_dsc = dsc.srk_dsc
-JOIN dw.dim_cur cur ON f.srk_cur = cur.srk_cur
-WHERE dsc.cod_dsc = 'MAT0025'
-ORDER BY t.ano, t.sem_ano, cur.nme_cur;
+SELECT
+    d.nme_dpt,
+    SUM(f.dst)                                           AS total_discentes,
+    SUM(f.ins)                                            AS total_insucessos,
+    ROUND(SUM(f.ins)::numeric / NULLIF(SUM(f.dst), 0) * 100, 2) AS taxa_insucesso_pct
+FROM dw.fat_ins_dsc f
+JOIN dw.dim_dpt d ON d.srk_dpt = f.srk_dpt
+GROUP BY d.nme_dpt
+ORDER BY taxa_insucesso_pct DESC, total_insucessos DESC;
 ```
 ![Consulta-2](./assets/Query-2.png)
 
 ### Exemplo 3: Comparação entre Cursos
 ```sql
-SELECT 
+SELECT
     c.nme_cur,
-    COUNT(DISTINCT f.srk_dsc) AS total_disciplinas,
-    SUM(f.dst) AS total_discentes,
-    SUM(f.ins) AS total_insucessos,
-    ROUND(SUM(f.ins)::NUMERIC / SUM(f.dst) * 100, 2) AS taxa_insucesso
-FROM dw.fat_ins f
-JOIN dw.dim_cur c ON f.srk_cur = c.srk_cur
-GROUP BY c.nme_cur;
+    SUM(f.dst)                                           AS total_discentes,
+    SUM(f.ins)                                            AS total_insucessos,
+    ROUND(SUM(f.ins)::numeric / NULLIF(SUM(f.dst), 0) * 100, 2) AS taxa_insucesso_pct
+FROM dw.fat_ins_dsc f
+JOIN dw.dim_cur c ON c.srk_cur = f.srk_cur
+GROUP BY c.nme_cur
+ORDER BY taxa_insucesso_pct DESC, total_insucessos DESC;
 ```
 ![Consulta-3](./assets/Query-3.png)
+
+
+### Exemplo 4: 
+```sql
+SELECT
+    t.ano,
+    t."sem_ano",
+    SUM(f.dst)                                           AS total_discentes,
+    SUM(f.ins)                                            AS total_insucessos,
+    ROUND(SUM(f.ins)::numeric / NULLIF(SUM(f.dst), 0) * 100, 2) AS taxa_insucesso_pct
+FROM dw.fat_ins_dsc f
+JOIN dw.dim_tmp t ON t.srk_tmp = f.srk_tmp
+GROUP BY t.ano, t."sem_ano"
+ORDER BY t.ano, t."sem_ano";
+```
+![Consulta-4](./assets/Query-4.png)
+
+### Exemplo 5: 
+```sql
+SELECT
+    dd.cod_dsc,
+    dd.nme_dsc,
+    SUM(f.dst)                                           AS total_discentes,
+    SUM(f.ins)                                            AS total_insucessos,
+    ROUND(SUM(f.ins)::numeric / NULLIF(SUM(f.dst), 0) * 100, 2) AS taxa_insucesso_pct
+FROM dw.fat_ins_dsc f
+JOIN dw.dim_dsc dd ON dd.srk_dsc = f.srk_dsc
+GROUP BY dd.cod_dsc, dd.nme_dsc
+HAVING SUM(f.dst) >= 100
+ORDER BY taxa_insucesso_pct DESC, total_insucessos DESC
+LIMIT 20;
+```
+![Consulta-5](./assets/Query-5.png)
+
+### Exemplo 6: 
+```sql
+SELECT
+    dd.cod_dsc,
+    dd.nme_dsc,
+    SUM(f.dst)                                           AS total_discentes,
+    SUM(f.ins)                                            AS total_insucessos,
+    ROUND(SUM(f.ins)::numeric / NULLIF(SUM(f.dst), 0) * 100, 2) AS taxa_insucesso_pct
+FROM dw.fat_ins_dsc f
+JOIN dw.dim_dsc dd ON dd.srk_dsc = f.srk_dsc
+GROUP BY dd.cod_dsc, dd.nme_dsc
+HAVING SUM(f.dst) >= 100
+ORDER BY total_insucessos DESC, taxa_insucesso_pct DESC
+LIMIT 20;
+```
+![Consulta-6](./assets/Query-6.png)
+
+### Exemplo 7: 
+```sql
+SELECT
+    dd.cod_dsc,
+    dd.nme_dsc,
+    SUM(f.dst)                                           AS total_discentes,
+    SUM(f.ins)                                            AS total_insucessos,
+    ROUND(SUM(f.ins)::numeric / NULLIF(SUM(f.dst), 0) * 100, 2) AS taxa_insucesso_pct
+FROM dw.fat_ins_dsc f
+JOIN dw.dim_dsc dd ON dd.srk_dsc = f.srk_dsc
+GROUP BY dd.cod_dsc, dd.nme_dsc
+HAVING SUM(f.dst) >= 100
+ORDER BY total_insucessos DESC, taxa_insucesso_pct DESC
+LIMIT 20;
+```
+![Consulta-7](./assets/Query-7.png)
+
+### Exemplo 8: 
+```sql
+SELECT
+    d.nme_dpt,
+    SUM(f.rpv_med)     AS rpv_med,
+    SUM(f.rpv_not)     AS rpv_not,
+    SUM(f.rpv_fal)     AS rpv_fal,
+    SUM(f.rpv_med_fal) AS rpv_med_fal,
+    SUM(f.rpv_not_fal) AS rpv_not_fal,
+    (SUM(f.rpv_med)+SUM(f.rpv_not)+SUM(f.rpv_fal)+SUM(f.rpv_med_fal)+SUM(f.rpv_not_fal)) AS total_reprovacoes,
+    ROUND(SUM(f.rpv_med)::numeric     / NULLIF((SUM(f.rpv_med)+SUM(f.rpv_not)+SUM(f.rpv_fal)+SUM(f.rpv_med_fal)+SUM(f.rpv_not_fal)), 0) * 100, 2) AS pct_rpv_med,
+    ROUND(SUM(f.rpv_not)::numeric     / NULLIF((SUM(f.rpv_med)+SUM(f.rpv_not)+SUM(f.rpv_fal)+SUM(f.rpv_med_fal)+SUM(f.rpv_not_fal)), 0) * 100, 2) AS pct_rpv_not,
+    ROUND(SUM(f.rpv_fal)::numeric     / NULLIF((SUM(f.rpv_med)+SUM(f.rpv_not)+SUM(f.rpv_fal)+SUM(f.rpv_med_fal)+SUM(f.rpv_not_fal)), 0) * 100, 2) AS pct_rpv_fal,
+    ROUND(SUM(f.rpv_med_fal)::numeric / NULLIF((SUM(f.rpv_med)+SUM(f.rpv_not)+SUM(f.rpv_fal)+SUM(f.rpv_med_fal)+SUM(f.rpv_not_fal)), 0) * 100, 2) AS pct_rpv_med_fal,
+    ROUND(SUM(f.rpv_not_fal)::numeric / NULLIF((SUM(f.rpv_med)+SUM(f.rpv_not)+SUM(f.rpv_fal)+SUM(f.rpv_med_fal)+SUM(f.rpv_not_fal)), 0) * 100, 2) AS pct_rpv_not_fal
+FROM dw.fat_ins_dsc f
+JOIN dw.dim_dpt d ON d.srk_dpt = f.srk_dpt
+GROUP BY d.nme_dpt
+ORDER BY total_reprovacoes DESC;
+```
+![Consulta-8](./assets/Query-8.png)
+
+### Exemplo 9: 
+```sql
+SELECT
+    d.nme_dpt,
+    c.nme_cur,
+    SUM(f.dst)                                           AS total_discentes,
+    SUM(f.ins)                                            AS total_insucessos,
+    ROUND(SUM(f.ins)::numeric / NULLIF(SUM(f.dst), 0) * 100, 2) AS taxa_insucesso_pct
+FROM dw.fat_ins_dsc f
+JOIN dw.dim_dpt d ON d.srk_dpt = f.srk_dpt
+JOIN dw.dim_cur c ON c.srk_cur = f.srk_cur
+GROUP BY d.nme_dpt, c.nme_cur
+ORDER BY d.nme_dpt, taxa_insucesso_pct DESC, c.nme_cur;
+```
+![Consulta-9](./assets/Query-9.png)
 
 ## Tabela Original
 
