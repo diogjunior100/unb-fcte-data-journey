@@ -5,3 +5,4 @@ openpyxl
 seaborn
 psycopg2-binary
 python-dotenv
+SQLAlchemy>=2.0,<3.0
