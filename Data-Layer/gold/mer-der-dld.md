@@ -66,7 +66,7 @@ O modelo segue o padrão **Star Schema** (Schema Estrela), onde uma tabela centr
 
 ### Tabela de Fatos
 
-#### FATO_INS
+#### FAT_INS_DSC
 
 **Descrição**: Tabela central que armazena as métricas de insucesso acadêmico para cada combinação de disciplina, tempo, departamento e curso.
 
@@ -94,22 +94,22 @@ O modelo segue o padrão **Star Schema** (Schema Estrela), onde uma tabela centr
 
 ## Relacionamentos
 
-### DIM_DSC → FATO_INS
+### DIM_DSC → FAT_INS_DSC
 - **Cardinalidade**: 1:N (Um para Muitos)
 - **Descrição**: Uma disciplina pode ter múltiplos registros de fatos (em diferentes semestres, cursos, etc.)
 - **Integridade Referencial**: `ON DELETE CASCADE` - Se uma disciplina for removida, todos os fatos relacionados são removidos
 
-### DIM_TMP → FATO_INS
+### DIM_TMP → FAT_INS_DSC
 - **Cardinalidade**: 1:N (Um para Muitos)
 - **Descrição**: Um período de tempo pode ter múltiplos registros de fatos (diferentes disciplinas, cursos, etc.)
 - **Integridade Referencial**: `ON DELETE CASCADE` - Se um período for removido, todos os fatos relacionados são removidos
 
-### DIM_DPT → FATO_INS
+### DIM_DPT → FAT_INS_DSC
 - **Cardinalidade**: 1:N (Um para Muitos)
 - **Descrição**: Um departamento pode ter múltiplos registros de fatos (diferentes disciplinas, semestres, cursos, etc.)
 - **Integridade Referencial**: `ON DELETE CASCADE` - Se um departamento for removido, todos os fatos relacionados são removidos
 
-### DIM_CUR → FATO_INS
+### DIM_CUR → FAT_INS_DSC
 - **Cardinalidade**: 1:N (Um para Muitos)
 - **Descrição**: Um curso pode ter múltiplos registros de fatos (diferentes disciplinas, semestres, departamentos, etc.)
 - **Integridade Referencial**: `ON DELETE CASCADE` - Se um curso for removido, todos os fatos relacionados são removidos
@@ -120,7 +120,7 @@ O modelo segue o padrão **Star Schema** (Schema Estrela), onde uma tabela centr
 - **DIM_TMP**: `srk_tmp` (INT, autoincrementado)
 - **DIM_DPT**: `srk_dpt` (INT, autoincrementado)
 - **DIM_CUR**: `srk_cur` (INT, autoincrementado)
-- **FAT_DISCIPLINAS**: `srk` (INT, autoincrementado)
+- **FAT_INS_DSC**: `srk` (INT, autoincrementado)
 
 ## Diagrama Entidade-Relacionamento (DER)
 
@@ -156,7 +156,7 @@ erDiagram
         string nme_cur "Nome do curso"
     }
     
-    FATO_INS {
+    FAT_INS_DSC {
         int srk PK "Identificador único"
         int srk_dsc FK "Referência à disciplina"
         int srk_tmp FK "Referência ao tempo"
@@ -174,10 +174,10 @@ erDiagram
         int ins "Total de insucessos"
     }
     
-    DIM_DSC ||--o{ FATO_INS : "tem"
-    DIM_TMP ||--o{ FATO_INS : "ocorre em"
-    DIM_DPT ||--o{ FATO_INS : "pertence a"
-    DIM_CUR ||--o{ FATO_INS : "oferecido para"
+    DIM_DSC ||--o{ FAT_INS_DSC : "tem"
+    DIM_TMP ||--o{ FAT_INS_DSC : "ocorre em"
+    DIM_DPT ||--o{ FAT_INS_DSC : "pertence a"
+    DIM_CUR ||--o{ FAT_INS_DSC : "oferecido para"
 ```
 
 ## Diagrama Lógico de Dados (DLD)
